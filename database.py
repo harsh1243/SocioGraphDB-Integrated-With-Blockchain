@@ -1,15 +1,17 @@
 import sqlite3
 from config import DB_PATH
 
-# DATABASE HELPERS
 def get_conn():
+    """Establishes database connection."""
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
+    """Initializes the database tables."""
     conn = get_conn()
     c = conn.cursor()
+    
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY,
@@ -31,5 +33,6 @@ def init_db():
     c.execute("""CREATE TABLE IF NOT EXISTS replies (id INTEGER PRIMARY KEY, post_id INTEGER, user_id INTEGER, text TEXT, created_at REAL, FOREIGN KEY(post_id) REFERENCES posts(id), FOREIGN KEY(user_id) REFERENCES users(id))""")
     c.execute("""CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, sender_id INTEGER, receiver_id INTEGER, text TEXT, created_at REAL, FOREIGN KEY(sender_id) REFERENCES users(id), FOREIGN KEY(receiver_id) REFERENCES users(id))""")
     c.execute("""CREATE TABLE IF NOT EXISTS notifications (id INTEGER PRIMARY KEY, user_id INTEGER, text TEXT, seen INTEGER DEFAULT 0, created_at REAL, FOREIGN KEY(user_id) REFERENCES users(id))""")
+    
     conn.commit()
-    return conn
+    conn.close()
