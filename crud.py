@@ -85,7 +85,7 @@ def search_posts(term: str) -> List[sqlite3.Row]:
     c.execute("SELECT p.*, u.username, u.display_name, u.profile_pic_path FROM posts p JOIN users u ON p.user_id = u.id WHERE p.text LIKE ? ORDER BY p.created_at DESC LIMIT 100", (q,))
     return c.fetchall()
 
-# --- INTERACTIONS (Likes, Follows, Replies) ---
+# --- INTERACTIONS ---
 def create_notification(user_id: int, text: str):
     conn = get_conn()
     c = conn.cursor()
@@ -156,7 +156,7 @@ def reply_to_post(user_id: int, post_id: int, text: str):
     post = get_post(post_id)
     if post: create_notification(post['user_id'], f"@{get_user_by_id(user_id)['username']} replied to your post")
 
-# --- GETTERS FOR LISTS ---
+# --- DATA GETTERS ---
 def get_liked_posts_for_user(user_id: int) -> List[sqlite3.Row]:
     c = get_conn().cursor()
     c.execute("SELECT p.*, u.username, u.display_name, u.profile_pic_path FROM posts p JOIN users u ON p.user_id = u.id JOIN likes l ON l.post_id = p.id WHERE l.user_id = ? ORDER BY l.created_at DESC", (user_id,))
